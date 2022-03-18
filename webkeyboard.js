@@ -15,7 +15,7 @@ class MidiREST {
     note_on(key){
 	var midi_msg = [0x91, key, 63];
 	var midi_msg_json = JSON.stringify(midi_msg);
-	//this.send_data(midi_msg_json);
+	this.send_data(midi_msg_json);
 	outputToConsole("note_on " + midi_msg_json );
     }
     
@@ -25,18 +25,19 @@ class MidiREST {
 	//this.send_data(midi_msg_json);	
         outputToConsole("note_off " + midi_msg_json);
   }
-/*
-    send_data(midi_msg){
+
+send_data(midi_msg){
 	var xhttp = new XMLHttpRequest();
 	xhttp.onreadystatechange = function() {
 	    if (this.readyState == 4 && this.status == 200) {
-		alert(this.responseText);
+		    alert(this.responseText);
 	    }
 	};
-	xhttp.open("POST", "http://192.168.234.13:5000/midi_endpoint", true);
+	xhttp.open("POST", "http://127.0.0.1:5000/midi_endpoint", true);
 	xhttp.setRequestHeader("Content-type", "application/json");
 	xhttp.send(midi_msg);
-    }*/
+  
+}
 }
 var current_index = 0;
 var clicked = false;
@@ -44,21 +45,21 @@ let midi = new MidiREST();
 
 
 $(".key").on("mousedown", function() {
-    var index = $(this).index('.key');
+    var index = 60 + $(this).index('.key');
     midi.note_on(index);
     current_index = index;
     clicked = true;
 });
 
 $(".key").on("mouseleave", function() {
-    var index = $(this).index('.key');
+    var index = 60 + $(this).index('.key');
     if(clicked == true){
       midi.note_off(index);  
     }
 });
 
 $(".key").on("mouseover",function() {
-    var index = $(this).index('.key');
+    var index = 60 + $(this).index('.key');
     if(clicked == true){
         midi.note_on(index);
     }

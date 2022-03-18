@@ -1,3 +1,9 @@
+function getServerAddress() {
+  server_ip = document.getElementById("server_id").value;
+  var server_adress = 'http://'.concat(server_ip,':5000');
+  return server_adress;
+}
+
 function outputToConsole(text) {
   var para = document.createElement("p");
   var node = document.createTextNode(text);
@@ -7,42 +13,40 @@ function outputToConsole(text) {
 }
 
 class MidiREST {
-    constructor(){
-	
-    }
-
-
-    note_on(key){
-	var midi_msg = [0x91, key, 63];
-	var midi_msg_json = JSON.stringify(midi_msg);
-	this.send_data(midi_msg_json);
-	outputToConsole("note_on " + midi_msg_json );
-    }
-    
-    note_off(key){
-	var midi_msg = [0x81, key, 63];
-	var midi_msg_json = JSON.stringify(midi_msg);
-	//this.send_data(midi_msg_json);	
-        outputToConsole("note_off " + midi_msg_json);
+  constructor(){
+    document.getElementById("server_id").setAttribute('value','127.0.0.1');
   }
 
-send_data(midi_msg){
-	var xhttp = new XMLHttpRequest();
-	xhttp.onreadystatechange = function() {
-	    if (this.readyState == 4 && this.status == 200) {
-		    alert(this.responseText);
-	    }
-	};
-	xhttp.open("POST", "http://127.0.0.1:5000/midi_endpoint", true);
-	xhttp.setRequestHeader("Content-type", "application/json");
-	xhttp.send(midi_msg);
-  
-}
+  note_on(key){
+    var midi_msg = [0x91, key, 63];
+    var midi_msg_json = JSON.stringify(midi_msg);
+    this.send_data(midi_msg_json);
+    outputToConsole("note_on " + midi_msg_json );
+  }
+    
+  note_off(key){
+    var midi_msg = [0x81, key, 63];
+    var midi_msg_json = JSON.stringify(midi_msg);
+    this.send_data(midi_msg_json);  
+    outputToConsole("note_off " + midi_msg_json);
+  }
+
+  send_data(midi_msg){
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        alert(this.responseText);
+      }
+    };
+    var midi_endpoint = "".concat(getServerAddress(),'/midi_endpoint');
+    xhttp.open("POST", midi_endpoint, true);
+    xhttp.setRequestHeader("Content-type", "application/json");
+    xhttp.send(midi_msg); 
+  }
 }
 var current_index = 0;
 var clicked = false;
 let midi = new MidiREST();
-
 
 $(".key").on("mousedown", function() {
     var index = 60 + $(this).index('.key');
@@ -68,7 +72,7 @@ $(".key").on("mouseover",function() {
 $(".piano").on("mouseleave", function() {
     clicked = false;
 });
-	     
+       
 // Achtung mousklick is ok, aber wenn wir die Moustaste loslassen
 // sind wir dann eigentlich noch auf dem selben DOM-Element????
 //wir nehmen das erstmal an
@@ -109,6 +113,5 @@ $.fn.bindMobileEvents = function () {
       first.target.dispatchEvent(simulatedEvent);
     });
   };
-
 
 $(".key").bindMobileEvents();

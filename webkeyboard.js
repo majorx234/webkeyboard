@@ -73,11 +73,8 @@ $(".piano").on("mouseleave", function() {
     clicked = false;
 });
        
-// Achtung mousklick is ok, aber wenn wir die Moustaste loslassen
-// sind wir dann eigentlich noch auf dem selben DOM-Element????
-//wir nehmen das erstmal an
 $(".key").on("mouseup", function() {
-    var index = $(this).index('.key');
+    var index = 60 + $(this).index('.key');
     midi.note_off(index);
     clicked = false;
 });

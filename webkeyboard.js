@@ -1,6 +1,5 @@
 function getServerAddress() {
-  server_ip = document.getElementById("server_id").value;
-  var server_adress = 'http://'.concat(server_ip,':5000');
+  var server_adress = 'http://'.concat(location.hostname,':5000');
   return server_adress;
 }
 
@@ -14,7 +13,6 @@ function outputToConsole(text) {
 
 class MidiREST {
   constructor(){
-    document.getElementById("server_id").setAttribute('value','127.0.0.1');
   }
 
   note_on(key){
@@ -23,11 +21,11 @@ class MidiREST {
     this.send_data(midi_msg_json);
     outputToConsole("note_on " + midi_msg_json );
   }
-    
+
   note_off(key){
     var midi_msg = [0x81, key, 63];
     var midi_msg_json = JSON.stringify(midi_msg);
-    this.send_data(midi_msg_json);  
+    this.send_data(midi_msg_json);
     outputToConsole("note_off " + midi_msg_json);
   }
 
@@ -41,7 +39,7 @@ class MidiREST {
     var midi_endpoint = "".concat(getServerAddress(),'/midi_endpoint');
     xhttp.open("POST", midi_endpoint, true);
     xhttp.setRequestHeader("Content-type", "application/json");
-    xhttp.send(midi_msg); 
+    xhttp.send(midi_msg);
   }
 }
 var current_index = 0;

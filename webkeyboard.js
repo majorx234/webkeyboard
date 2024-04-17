@@ -18,15 +18,26 @@ class MidiREST {
   note_on(key){
     var midi_msg = [0x91, key, 63];
     var midi_msg_json = JSON.stringify(midi_msg);
-    this.send_data(midi_msg_json);
+    this.send_midimsgs(midi_msg_json);
     outputToConsole("note_on " + midi_msg_json );
   }
 
   note_off(key){
     var midi_msg = [0x81, key, 63];
     var midi_msg_json = JSON.stringify(midi_msg);
-    this.send_data(midi_msg_json);
+    this.send_midimsgs(midi_msg_json);
     outputToConsole("note_off " + midi_msg_json);
+  }
+
+  send_midimsgs(midi_data){
+    let send_raw = true;
+    let midi_msg = midi_data;
+    if (!send_raw) {
+      midi_msg = {
+        status:send_raw[0], data1:send_raw[0], data2:send_raw[0]
+      };
+    }
+    this.send_data(midi_msg);
   }
 
   send_data(midi_msg){
@@ -56,7 +67,7 @@ $(".key").on("mousedown", function() {
 $(".key").on("mouseleave", function() {
     var index = 60 + $(this).index('.key');
     if(clicked == true){
-      midi.note_off(index);  
+      midi.note_off(index);
     }
 });
 
@@ -70,7 +81,7 @@ $(".key").on("mouseover",function() {
 $(".piano").on("mouseleave", function() {
     clicked = false;
 });
-       
+
 $(".key").on("mouseup", function() {
     var index = 60 + $(this).index('.key');
     midi.note_off(index);
@@ -98,10 +109,10 @@ $.fn.bindMobileEvents = function () {
         return;
       }
 
-      var simulatedEvent = document.createEvent('MouseEvent'); 
+      var simulatedEvent = document.createEvent('MouseEvent');
       simulatedEvent.initMouseEvent(
-        type, true, true, window, 1, 
-        first.screenX, first.screenY, first.clientX, first.clientY, 
+        type, true, true, window, 1,
+        first.screenX, first.screenY, first.clientX, first.clientY,
         false, false, false, false, 0/*left*/, null
       );
 

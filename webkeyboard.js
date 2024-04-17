@@ -1,5 +1,5 @@
 function getServerAddress() {
-  var server_adress = 'http://'.concat(location.hostname,':5000');
+  var server_adress = 'http://'.concat(location.hostname,':8000');
   return server_adress;
 }
 

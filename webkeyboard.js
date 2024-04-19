@@ -17,16 +17,12 @@ class MidiREST {
 
   note_on(key){
     var midi_msg = [0x91, key, 63];
-    var midi_msg_json = JSON.stringify(midi_msg);
-    this.send_midimsgs(midi_msg_json);
-    outputToConsole("note_on " + midi_msg_json );
+    this.send_midimsgs(midi_msg);
   }
 
   note_off(key){
     var midi_msg = [0x81, key, 63];
-    var midi_msg_json = JSON.stringify(midi_msg);
-    this.send_midimsgs(midi_msg_json);
-    outputToConsole("note_off " + midi_msg_json);
+    this.send_midimsgs(midi_msg);
   }
 
   send_midimsgs(midi_data){
@@ -37,20 +33,21 @@ class MidiREST {
         status:send_raw[0], data1:send_raw[0], data2:send_raw[0]
       };
     }
-    this.send_data(midi_msg);
+    this.send_data(JSON.stringify(midi_msg));
   }
 
-  send_data(midi_msg){
-    var xhttp = new XMLHttpRequest();
+    send_data(midi_msg, debug){
+    let xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
       if (this.readyState == 4 && this.status == 200) {
         alert(this.responseText);
       }
     };
-    var midi_endpoint = "".concat(getServerAddress(),'/midi_endpoint');
+    let midi_endpoint = getServerAddress() + '/midi_endpoint';
     xhttp.open("POST", midi_endpoint, true);
     xhttp.setRequestHeader("Content-type", "application/json");
     xhttp.send(midi_msg);
+    outputToConsole("send: " + midi_msg);
   }
 }
 var current_index = 0;

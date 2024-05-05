@@ -129,7 +129,7 @@ class WebkeyboardComponent extends HTMLElement {
         this.root.appendChild(template.content.cloneNode(true));
     }
     connectedCallback() {
-        this.root.querySelector("#key").bindMobileEvents();
+        this.root.querySelectorAll(".key").bindMobileEvents();
     }
 
     attributeChangedCallback(name, oldValue, newValue) {

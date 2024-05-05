@@ -89,6 +89,39 @@ template.innerHTML = /*html*/ `
 </div>
 `;
 
+$.fn.bindMobileEvents = function () {
+  $(this).on('touchstart touchmove touchend touchcancel', function () {
+      var touches = (event.changedTouches || event.originalEvent.targetTouches),
+          first = touches[0],
+          type = '';
+
+      switch (event.type) {
+      case 'touchstart':
+        type = 'mousedown';
+        break;
+      case 'touchmove':
+        type = 'mousemove';
+        event.preventDefault();
+        break;
+      case 'touchend':
+        type = 'mouseup';
+        break;
+      default:
+        return;
+      }
+
+      var simulatedEvent = document.createEvent('MouseEvent');
+      simulatedEvent.initMouseEvent(
+        type, true, true, window, 1,
+        first.screenX, first.screenY, first.clientX, first.clientY,
+        false, false, false, false, 0/*left*/, null
+      );
+
+      first.target.dispatchEvent(simulatedEvent);
+    });
+  };
+
+
 class WebkeyboardComponent extends HTMLElement {
     constructor() {
         super();
@@ -96,6 +129,7 @@ class WebkeyboardComponent extends HTMLElement {
         this.root.appendChild(template.content.cloneNode(true));
     }
     connectedCallback() {
+        this.root.querySelector("#key").bindMobileEvents();
     }
 
     attributeChangedCallback(name, oldValue, newValue) {

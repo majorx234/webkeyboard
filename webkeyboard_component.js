@@ -89,38 +89,6 @@ template.innerHTML = /*html*/ `
 </div>
 `;
 
-$.fn.bindMobileEvents = function () {
-  $(this).on('touchstart touchmove touchend touchcancel', function () {
-      var touches = (event.changedTouches || event.originalEvent.targetTouches),
-          first = touches[0],
-          type = '';
-
-      switch (event.type) {
-      case 'touchstart':
-        type = 'mousedown';
-        break;
-      case 'touchmove':
-        type = 'mousemove';
-        event.preventDefault();
-        break;
-      case 'touchend':
-        type = 'mouseup';
-        break;
-      default:
-        return;
-      }
-
-      var simulatedEvent = document.createEvent('MouseEvent');
-      simulatedEvent.initMouseEvent(
-        type, true, true, window, 1,
-        first.screenX, first.screenY, first.clientX, first.clientY,
-        false, false, false, false, 0/*left*/, null
-      );
-
-      first.target.dispatchEvent(simulatedEvent);
-  });
-};
-
 function getServerAddress() {
   var server_adress = 'http://'.concat(location.hostname,':8000');
   return server_adress;
@@ -178,37 +146,36 @@ class WebkeyboardComponent extends HTMLElement {
 
     }
     connectedCallback() {
-        this.root.querySelectorAll(".key").bindMobileEvents();
-        this.root.querySelectorAll(".key").on("mousedown", function() {
+        this.root.querySelectorAll(".key").onmousedown = (event) => {
             var index = 60 + $(this).index('.key');
             midi.note_on(index);
             current_index = index;
             clicked = true;
-        });
+        };
 
-        this.root.querySelectorAll(".key").on("mouseleave", function() {
+        this.root.querySelectorAll(".key").onmouseleave = (event) =>  {
             var index = 60 + $(this).index('.key');
             if(clicked == true){
                 midi.note_off(index);
             }
-        });
+        };
 
-        this.root.querySelectorAll(".key").on("mouseover",function() {
+        this.root.querySelectorAll(".key").onmouseover = (event) =>  {
             var index = 60 + $(this).index('.key');
             if(clicked == true){
                 midi.note_on(index);
             }
-        });
+        };
 
-        this.root.querySelectorAll(".piano").on("mouseleave", function() {
+        this.root.querySelectorAll(".piano").onmouseleave = (event) =>  {
             clicked = false;
-        });
+        };
 
-        this.root.querySelectorAll(".key").on("mouseup", function() {
+        this.root.querySelectorAll(".key").onmouseup = (event) =>  {
             var index = 60 + $(this).index('.key');
             midi.note_off(index);
             clicked = false;
-        });
+        };
     }
 
     attributeChangedCallback(name, oldValue, newValue) {

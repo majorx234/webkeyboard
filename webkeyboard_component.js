@@ -145,6 +145,11 @@ class WebkeyboardComponent extends HTMLElement {
         this.midi = new MidiREST();
 
     }
+
+    logEvent(log_msg) {
+        this.dispatchEvent(new CustomEvent("log-event",{detail : log_msg} ));
+    }
+
     connectedCallback() {
         this.root.querySelectorAll(".key").onmousedown = (event) => {
             var index = 60 + $(this).index('.key');

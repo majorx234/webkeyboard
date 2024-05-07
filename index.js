@@ -9,6 +9,9 @@ function outputToConsole(text) {
 function create_webkeyboard() {
     let content_tag = document.getElementById("content");
     let webkeyboard_component_tag = document.createElement("webkeyboard-component");
+    webkeyboard_component_tag.addEventListener("log-event",(event) => {
+        outputToConsole(event.detail);
+    });
     content_tag.append(webkeyboard_component_tag);
 }
 
@@ -22,3 +25,4 @@ function create_console() {
 create_webkeyboard();
 create_console();
 outputToConsole("init successful");
+

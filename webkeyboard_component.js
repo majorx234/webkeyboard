@@ -95,7 +95,11 @@ function getServerAddress() {
 }
 
 class MidiREST {
-  constructor(){
+  constructor(debug_fct) {
+    this.debug_fct = null;
+    if (debug_fct) {
+      this.debug_fct = debug_fct;
+    }
   }
 
   note_on(key){
@@ -116,10 +120,10 @@ class MidiREST {
         status:send_raw[0], data1:send_raw[0], data2:send_raw[0]
       };
     }
-    this.send_data(JSON.stringify(midi_msg));
+    this.send_data(JSON.stringify(midi_msg), this.debug_fct);
   }
 
-    send_data(midi_msg, debug){
+  send_data(midi_msg, debug_fct){
     let xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
       if (this.readyState == 4 && this.status == 200) {
@@ -130,8 +134,9 @@ class MidiREST {
     xhttp.open("POST", midi_endpoint, true);
     xhttp.setRequestHeader("Content-type", "application/json");
     xhttp.send(midi_msg);
-    // TODO fix console
-    // outputToConsole("send: " + midi_msg);
+    if (debug_fct) {
+      debug_fct("send: " + midi_msg);
+    }
   }
 }
 
@@ -142,8 +147,9 @@ class WebkeyboardComponent extends HTMLElement {
         this.root.appendChild(template.content.cloneNode(true));
         this.current_index = 0;
         this.clicked = false;
-        this.midi = new MidiREST();
-
+        this.midi = new MidiREST((msg) => {
+            this.logEvent(msg);
+        });
     }
 
     logEvent(log_msg) {
@@ -151,49 +157,67 @@ class WebkeyboardComponent extends HTMLElement {
     }
 
     connectedCallback() {
-        this.root.querySelectorAll(".key").onmousedown = (event) => {
-            var index = 60 + $(this).index('.key');
-            midi.note_on(index);
-            current_index = index;
-            clicked = true;
-        };
+        let keys = this.root.querySelectorAll(".key");
+        keys.forEach((el) => { el.onmousedown = (event) => {
+            let li = event.target.parentElement;
+            let ul = event.target.parentElement.parentElement;
+            let index = 60 + ([...ul.childNodes].indexOf(li)-1)/2;
+            this.midi.note_on(index);
+            this.current_index = index;
+            this.clicked = true;
+        };});
 
-        this.root.querySelectorAll(".key").onmouseleave = (event) =>  {
-            var index = 60 + $(this).index('.key');
-            if(clicked == true){
-                midi.note_off(index);
+        keys = this.root.querySelectorAll(".key");
+        keys.forEach((el) => { el.onmouseup = (event) =>  {
+            let li = event.target.parentElement;
+            let ul = event.target.parentElement.parentElement;
+            let index = 60 + ([...ul.childNodes].indexOf(li)-1)/2;
+            this.midi.note_off(index);
+            this.clicked = false;
+        };});
+
+        keys = this.root.querySelectorAll(".key");
+        keys.forEach((el) => { el.touchstart = (event) => {
+            let index = 60 + $(this).index('.key');
+            this.midi.note_on(index);
+            this.current_index = index;
+            this.clicked = true;
+            this.logEvent("upindex: " + index);
+        };});
+
+        keys = this.root.querySelectorAll(".key");
+        keys.forEach((el) => { el.onmouseleave = (event) =>  {
+            let li = event.target.parentElement;
+            let ul = event.target.parentElement.parentElement;
+            let index = 60 + ([...ul.childNodes].indexOf(li)-1)/2;
+            if(this.clicked == true){
+                this.midi.note_off(index);
             }
-        };
+        };});
 
-        this.root.querySelectorAll(".key").onmouseover = (event) =>  {
-            var index = 60 + $(this).index('.key');
-            if(clicked == true){
-                midi.note_on(index);
+        keys = this.root.querySelectorAll(".key");
+        keys.forEach((el) => { el.onmouseover = (event) =>  {
+            let li = event.target.parentElement;
+            let ul = event.target.parentElement.parentElement;
+            let index = 60 + ([...ul.childNodes].indexOf(li)-1)/2;
+            if(this.clicked == true){
+                this.midi.note_on(index);
             }
-        };
+        };});
 
-        this.root.querySelectorAll(".piano").onmouseleave = (event) =>  {
-            clicked = false;
-        };
+        keys = this.root.querySelectorAll(".piano");
+        keys.forEach((el) => { el.onmouseleave = (event) =>  {
+            this.clicked = false;
+        };});
 
-        this.root.querySelectorAll(".key").onmouseup = (event) =>  {
-            var index = 60 + $(this).index('.key');
-            midi.note_off(index);
-            clicked = false;
-        };
-
-        this.root.querySelectorAll(".key").touchstart = (event) => {
-            var index = 60 + $(this).index('.key');
-            midi.note_on(index);
-            current_index = index;
-            clicked = true;
-        };
-
-        this.root.querySelectorAll(".key").ontouch = (event) =>  {
-            var index = 60 + $(this).index('.key');
-            midi.note_off(index);
-            clicked = false;
-        };
+        keys = this.root.querySelectorAll(".key");
+        keys.forEach((el) => { el.ontouch = (event) =>  {
+            let li = event.target.parentElement;
+            let ul = event.target.parentElement.parentElement;
+            let index = 60 + ([...ul.childNodes].indexOf(li)-1)/2;
+            this.midi.note_off(index);
+            this.clicked = false;
+        };});
     }
 
     attributeChangedCallback(name, oldValue, newValue) {

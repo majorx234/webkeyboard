@@ -176,6 +176,19 @@ class WebkeyboardComponent extends HTMLElement {
             midi.note_off(index);
             clicked = false;
         };
+
+        this.root.querySelectorAll(".key").touchstart = (event) => {
+            var index = 60 + $(this).index('.key');
+            midi.note_on(index);
+            current_index = index;
+            clicked = true;
+        };
+
+        this.root.querySelectorAll(".key").ontouch = (event) =>  {
+            var index = 60 + $(this).index('.key');
+            midi.note_off(index);
+            clicked = false;
+        };
     }
 
     attributeChangedCallback(name, oldValue, newValue) {

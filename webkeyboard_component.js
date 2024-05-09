@@ -94,6 +94,10 @@ function getServerAddress() {
   return server_adress;
 }
 
+function getKeyIndex(ul, li) {
+  return 60 + ([...ul.childNodes].indexOf(li)-1)/2;
+}
+
 class MidiREST {
   constructor(debug_fct) {
     this.debug_fct = null;
@@ -159,9 +163,10 @@ class WebkeyboardComponent extends HTMLElement {
     connectedCallback() {
         let keys = this.root.querySelectorAll(".key");
         keys.forEach((el) => { el.onmousedown = (event) => {
-            let li = event.target.parentElement;
-            let ul = event.target.parentElement.parentElement;
-            let index = 60 + ([...ul.childNodes].indexOf(li)-1)/2;
+            let index = getKeyIndex(
+                event.target.parentElement.parentElement,
+                event.target.parentElement
+            );
             this.midi.note_on(index);
             this.current_index = index;
             this.clicked = true;
@@ -169,16 +174,20 @@ class WebkeyboardComponent extends HTMLElement {
 
         keys = this.root.querySelectorAll(".key");
         keys.forEach((el) => { el.onmouseup = (event) =>  {
-            let li = event.target.parentElement;
-            let ul = event.target.parentElement.parentElement;
-            let index = 60 + ([...ul.childNodes].indexOf(li)-1)/2;
+            let index = getKeyIndex(
+                event.target.parentElement.parentElement,
+                event.target.parentElement
+            );
             this.midi.note_off(index);
             this.clicked = false;
         };});
 
         keys = this.root.querySelectorAll(".key");
         keys.forEach((el) => { el.touchstart = (event) => {
-            let index = 60 + $(this).index('.key');
+            let index = getKeyIndex(
+                event.target.parentElement.parentElement,
+                event.target.parentElement
+            );
             this.midi.note_on(index);
             this.current_index = index;
             this.clicked = true;
@@ -187,9 +196,10 @@ class WebkeyboardComponent extends HTMLElement {
 
         keys = this.root.querySelectorAll(".key");
         keys.forEach((el) => { el.onmouseleave = (event) =>  {
-            let li = event.target.parentElement;
-            let ul = event.target.parentElement.parentElement;
-            let index = 60 + ([...ul.childNodes].indexOf(li)-1)/2;
+            let index = getKeyIndex(
+                event.target.parentElement.parentElement,
+                event.target.parentElement
+            );
             if(this.clicked == true){
                 this.midi.note_off(index);
             }
@@ -197,9 +207,10 @@ class WebkeyboardComponent extends HTMLElement {
 
         keys = this.root.querySelectorAll(".key");
         keys.forEach((el) => { el.onmouseover = (event) =>  {
-            let li = event.target.parentElement;
-            let ul = event.target.parentElement.parentElement;
-            let index = 60 + ([...ul.childNodes].indexOf(li)-1)/2;
+            let index = getKeyIndex(
+                event.target.parentElement.parentElement,
+                event.target.parentElement
+            );
             if(this.clicked == true){
                 this.midi.note_on(index);
             }
@@ -212,9 +223,10 @@ class WebkeyboardComponent extends HTMLElement {
 
         keys = this.root.querySelectorAll(".key");
         keys.forEach((el) => { el.ontouch = (event) =>  {
-            let li = event.target.parentElement;
-            let ul = event.target.parentElement.parentElement;
-            let index = 60 + ([...ul.childNodes].indexOf(li)-1)/2;
+            let index = getKeyIndex(
+                event.target.parentElement.parentElement,
+                event.target.parentElement
+            );
             this.midi.note_off(index);
             this.clicked = false;
         };});
